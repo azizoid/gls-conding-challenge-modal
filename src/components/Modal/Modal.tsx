@@ -18,16 +18,25 @@ export const Modal = ({ show, onClose, title, children, onSave }: ModalProps) =>
     }
   };
 
+  const handleEscKey = (event: KeyboardEvent) => {
+    if (event.key === 'Escape') {
+      onClose();
+    }
+  };
+
   useEffect(() => {
     if (show) {
       document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleEscKey);
       document.body.style.overflow = 'hidden';
     } else {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscKey);
       document.body.style.overflow = 'unset';
     }
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscKey);
       document.body.style.overflow = 'unset';
     };
   }, [show]);
