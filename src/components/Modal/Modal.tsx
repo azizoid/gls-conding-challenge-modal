@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, useEffect, useRef } from 'react';
 import styles from './Modal.module.css';
 
 type ModalProps = {
@@ -10,12 +10,31 @@ type ModalProps = {
 }
 
 export const Modal = ({ show, onClose, title, children, onSave }: ModalProps) => {
-  const handleClickOutside = () => {
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  const handleClickOutside = (event: MouseEvent) => {
+    if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+      onClose();
+    }
   };
+
+  useEffect(() => {
+    if (show) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.body.style.overflow = 'unset';
+    };
+  }, [show]);
 
   return (
     <div className={`${styles.modalOverlay} ${show ? styles.show : ''}`}>
-      <div className={styles.modal} role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div className={styles.modal} ref={modalRef} role="dialog" aria-modal="true" aria-labelledby="modal-title">
         <header className={styles.modalHeader}>
           <h2 id="modal-title">{title}</h2>
         </header>
